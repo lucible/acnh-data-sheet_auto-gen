@@ -1,5 +1,6 @@
 import pandas as pd
 import importlib
+import math
 import sheet_values as sv
 
 ItemParam = pd.read_csv('data/csvs/ItemParam.csv')
@@ -8,19 +9,35 @@ ItemParam = pd.read_csv('data/csvs/ItemParam.csv')
 ## ADD UNIVERSAL COLUMNS TO ITEMPARAM ##
 ########################################
 
-ItemParam.rename(columns={'UniqueID': 'Internal ID', 'Label': 'Filename'}, inplace=True)
+ItemParam.rename(columns={'UniqueID': 'Internal ID', 'Label': 'Filename', 'Price': 'Buy'}, inplace=True)
+
+ItemParam['Filename'] = ItemParam['Filename'].map(lambda Filename: Filename.strip('\''))
 
 # DIY
-# Buy Price
-# Sell Price
-# Color 1
-# Color 2
-# Size
-# Surface
+ItemParam['DIY'] = ItemParam['CaptureDiyIcon'].map(lambda x: 'Yes' if x == 1 else 'No')
 
-# HHA Situation / Concept
-situation = pd.read_csv('data/sheet-values/HHASituation.csv')
-ItemParam = ItemParam.merge(situation, on='ItemHHASituation1')
+# Sell
+ItemParam['Sell'] = ItemParam['Buy'].map(lambda price: math.floor(price * 0.25))
+
+# Color 1 / Color 2
+ItemParam = ItemParam.replace({'Color1': 'LightBlue', 'Color2': 'LightBlue'}, 'Aqua')
+ItemParam.rename(columns={'Color1': 'Color 1', 'Color2': 'Color 2'}, inplace=True)
+
+# Size
+size = pd.read_csv('data/sheet-values/Size.csv')
+ItemParam = ItemParam.merge(size, on='ItemSize')
+
+# Surface
+surface = pd.read_csv('data/sheet-values/Surface.csv')
+ItemParam = ItemParam.merge(surface, on='ItemLayout')
+
+# HHA Concept 1
+situation1 = pd.read_csv('data/sheet-values/HHASituation1.csv')
+ItemParam = ItemParam.merge(situation1, on='ItemHHASituation1')
+
+# HHA Concept 2
+situation2 = pd.read_csv('data/sheet-values/HHASituation2.csv')
+ItemParam = ItemParam.merge(situation2, on='ItemHHASituation2')
 
 # Tag
 tag = pd.read_csv('data/sheet-values/Tag.csv')
@@ -40,7 +57,7 @@ ItemParam = ItemParam.merge(version_added.rename('Version Added'), left_on='Item
 
 housewares = ItemParam[ItemParam['ItemUICategory']=='Floor']
 
-tab_housewares = ['HHA Concept 1', 'Catalog', 'Version Added', 'Filename', 'Internal ID']
+tab_housewares = ['DIY', 'Sell', 'HHA Concept 1', 'Catalog', 'Version Added', 'Filename', 'Internal ID']
 
 housewares_final = pd.concat([housewares.pop(item) for item in tab_housewares], axis=1)
 

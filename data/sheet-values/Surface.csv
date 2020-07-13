@@ -1,0 +1,13 @@
+ItemLayout,Surface
+Floor,No
+Floor_Downer,Yes
+Floor_DownerFront,Yes
+Floor_DownerLeft,Yes
+Floor_DownerRight,Yes
+Floor_DownerUpper,Yes
+Floor_Gate,No
+Floor_Upper,No
+Rug,No
+Wall_1Unit,No
+Wall_HalfUnit,No
+Wall_NoCol,No
