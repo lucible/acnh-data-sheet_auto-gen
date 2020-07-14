@@ -5,7 +5,15 @@ import string_parse as sp
 
 ItemParam = pd.read_csv('data/csvs/ItemParam.csv')
 
-print(ItemParam.shape)
+## SHIT'S FUCKED RN BUT THIS IS IMPORTANT:
+"""
+you have to get the ClothGroup label from _690e3379 in ItemParam
+then match that to a UniqueID from the ItemClothGroup table. 
+those IDs match with strings
+
+Basically there's a many rows in ItemParam to one label in clothing strings relationship.
+But for item strings it should be a one to one relationship
+"""
 
 ########################################
 ## ADD UNIVERSAL COLUMNS TO ITEMPARAM ##
@@ -15,11 +23,16 @@ ItemParam.rename(columns={'UniqueID': 'Internal ID', 'Label': 'Filename', 'Price
 
 ItemParam['Filename'] = ItemParam['Filename'].map(lambda Filename: Filename.strip('\''))
 
+print(ItemParam.shape)
+print(ItemParam[ItemParam['ToiletType']==1])
+# ItemParam[['Internal ID', 'Filename']].to_csv(r'testing1.csv', index=False)
+
 # Name
 game_name = sp.getInGameNames()
-ItemParam = ItemParam.merge(game_name, left_on='Internal ID', right_on='label').drop('label', axis=1)
+ItemParam = ItemParam.merge(game_name, left_on='Internal ID', right_on='label', how='left').drop('label', axis=1)
 
 print(ItemParam.shape)
+# ItemParam[['Internal ID', 'Filename', 'Name']].to_csv(r'testing2.csv', index=False)
 """
 # FtrIcon / Storage Image
 ItemParam['FtrIcon'] = ItemParam['Filename'].map(lambda x: f'=IMAGE("https://acnhcdn.com/latest/FtrIcon/{x}.png")')
