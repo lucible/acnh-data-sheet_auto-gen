@@ -1,7 +1,7 @@
-import pandas as pd
-import importlib
 import math
+import pandas as pd
 import sheet_values as sv
+import string_parse as sp
 
 ItemParam = pd.read_csv('data/csvs/ItemParam.csv')
 
@@ -12,6 +12,10 @@ ItemParam = pd.read_csv('data/csvs/ItemParam.csv')
 ItemParam.rename(columns={'UniqueID': 'Internal ID', 'Label': 'Filename', 'Price': 'Buy'}, inplace=True)
 
 ItemParam['Filename'] = ItemParam['Filename'].map(lambda Filename: Filename.strip('\''))
+
+# Name
+game_name = sp.getInGameNames()
+ItemParam = ItemParam.merge(game_name, left_on='Internal ID', right_on='label').drop('label', axis=1)
 
 # DIY
 ItemParam['DIY'] = ItemParam['CaptureDiyIcon'].map(lambda x: 'Yes' if x == 1 else 'No')
@@ -57,7 +61,7 @@ ItemParam = ItemParam.merge(version_added.rename('Version Added'), left_on='Item
 
 housewares = ItemParam[ItemParam['ItemUICategory']=='Floor']
 
-tab_housewares = ['DIY', 'Sell', 'HHA Concept 1', 'Catalog', 'Version Added', 'Filename', 'Internal ID']
+tab_housewares = ['Name', 'DIY', 'Buy', 'Sell', 'Color 1', 'Color 2', 'Size', 'Surface', 'HHA Concept 1', 'HHA Concept 2', 'Tag', 'Catalog', 'Version Added', 'Filename', 'Internal ID']
 
 housewares_final = pd.concat([housewares.pop(item) for item in tab_housewares], axis=1)
 
