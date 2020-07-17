@@ -30,17 +30,9 @@ clothGroup.rename(columns={'UniqueID': 'ClothGroup ID', 'Label': 'Label_ClothGro
 
 clothSTR = sv.getClothingStrings()
 
-print('before merge:')
-print(clothGroup.shape)
-print(clothSTR.shape)
-
-clothGroup.to_csv(r'testing.csv', index=False)
-clothSTR.to_csv(r'shitme.csv', index=False)
 clothGroup = clothGroup.merge(clothSTR, on='ClothGroup ID', how='left')
 
-print('after merge:')
-print(clothGroup.shape)
-print(clothSTR.shape)
+print(clothGroup.tail)
 
 clothGroup.to_csv(r'testing2.csv', index=False)
 

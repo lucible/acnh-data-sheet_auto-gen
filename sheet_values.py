@@ -35,7 +35,7 @@ def getItemStrings():
     itemSTR = itemSTR.astype({'label': 'int64'})
     
     # Rename column 'text' to 'Name'
-    itemSTR.rename(columns={'text': 'Name', 'label': 'UniqueID'}, inplace=True)
+    itemSTR.rename(columns={'text': 'Name_Items', 'label': 'ItemSTR ID'}, inplace=True)
     
     return itemSTR
 
@@ -46,12 +46,12 @@ def getClothingStrings():
     clothingSTR = pd.concat([pd.read_csv(f'data/string/outfit/groupname/{file}', dtype=object) for file in clothing])
     
     # Strip label to ID only and remove yucky chars from name string
-    # clothingSTR = stripString(clothingSTR)
+    clothingSTR = stripString(clothingSTR)
     
     # Cast label to int64
     clothingSTR = clothingSTR.astype({'label': 'int64'})
     
     # Rename column 'text' to 'Name'
-    clothingSTR.rename(columns={'text': 'Name', 'label' : 'ClothGroup ID'}, inplace=True)
+    clothingSTR.rename(columns={'text': 'Name_Clothing', 'label' : 'ClothGroup ID'}, inplace=True)
     
     return clothingSTR
