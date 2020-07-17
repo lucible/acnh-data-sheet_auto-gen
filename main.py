@@ -30,8 +30,12 @@ ItemParam = ItemParam.merge(clothGroup, left_on='ClothGroup', right_on='Label_Cl
 itemSTR = sv.getItemStrings()
 ItemParam = ItemParam.merge(itemSTR, on='Internal ID', how='left')
 
-# ItemParam[['Internal ID', 'Filename', 'Name_Items', 'Name_Clothing']].to_csv(r'testing.csv', index=False)
-"""
+# Fill NaN with empty string & merge into single Name column
+ItemParam[['Name_Clothing', 'Name_Items']] = ItemParam[['Name_Clothing', 'Name_Items']].fillna('')
+ItemParam['Name'] = ItemParam['Name_Clothing'].astype(str) + ItemParam['Name_Items'].astype(str)
+
+# ItemParam[['Internal ID', 'Filename', 'Name']].to_csv(r'testing.csv', index=False)
+
 # FtrIcon / Storage Image
 ItemParam['FtrIcon'] = ItemParam['Filename'].map(lambda x: f'=IMAGE("https://acnhcdn.com/latest/FtrIcon/{x}.png")')
 
@@ -67,19 +71,19 @@ print(ItemParam.shape)
 
 # HHA Concept 1
 situation1 = pd.read_csv('data/sheet-values/HHASituation1.csv')
-ItemParam = ItemParam.merge(situation1, on='ItemHHASituation1')
+ItemParam = ItemParam.merge(situation1, on='ItemHHASituation1', how='left')
 
 print(ItemParam.shape)
 
 # HHA Concept 2
 situation2 = pd.read_csv('data/sheet-values/HHASituation2.csv')
-ItemParam = ItemParam.merge(situation2, on='ItemHHASituation2')
+ItemParam = ItemParam.merge(situation2, on='ItemHHASituation2', how='left')
 
 print(ItemParam.shape)
 
 # Tag
 tag = pd.read_csv('data/sheet-values/Tag.csv')
-ItemParam = ItemParam.merge(tag, on='ItemUIFurnitureCategory')
+ItemParam = ItemParam.merge(tag, on='ItemUIFurnitureCategory', how='left')
 
 print(ItemParam.shape)
 
@@ -94,7 +98,7 @@ version_added = pd.Series(sv.VersionAdded)
 ItemParam = ItemParam.merge(version_added.rename('Version Added'), left_on='ItemReleaseVersion', right_index=True)
 
 print(ItemParam.shape)
-"""
+
 #####################################
 ## CONSTRUCT HOUSEWARES DATA FRAME ##
 #####################################
