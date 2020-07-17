@@ -7,9 +7,9 @@ ItemParam = pd.read_csv('data/csvs/ItemParam.csv')
 
 ## SHIT'S FUCKED RN BUT THIS IS IMPORTANT:
 """
-you have to get the ClothGroup label from _690e3379 in ItemParam
-then match that to a UniqueID from the ItemClothGroup table. 
-those IDs match with strings
+here's the clothing item -> string process:
+join col "ClothGroup"/690e3379 from ItemParam with column "Label" in ItemClothGroup
+join col UniqueID from ItemClothGroup with the "Label" in the STR_OutfitGroupName files
 
 Basically there's a many rows in ItemParam to one label in clothing strings relationship.
 But for item strings it should be a one to one relationship
