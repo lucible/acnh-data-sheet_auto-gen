@@ -1,19 +1,8 @@
 import math
 import pandas as pd
 import sheet_values as sv
-import string_parse as sp
 
 ItemParam = pd.read_csv('data/csvs/ItemParam.csv')
-
-## SHIT'S FUCKED RN BUT THIS IS IMPORTANT:
-"""
-here's the clothing item -> string process:
-join col "ClothGroup"/690e3379 from ItemParam with column "Label" in ItemClothGroup
-join col UniqueID from ItemClothGroup with the "Label" in the STR_OutfitGroupName files
-
-Basically there's a many rows in ItemParam to one label in clothing strings relationship.
-But for item strings it should be a one to one relationship
-"""
 
 ########################################
 ## ADD UNIVERSAL COLUMNS TO ITEMPARAM ##
@@ -24,14 +13,51 @@ ItemParam.rename(columns={'UniqueID': 'Internal ID', 'Label': 'Filename', 'Price
 ItemParam['Filename'] = ItemParam['Filename'].map(lambda Filename: Filename.strip('\''))
 
 print(ItemParam.shape)
-print(ItemParam[ItemParam['ToiletType']==1])
-# ItemParam[['Internal ID', 'Filename']].to_csv(r'testing1.csv', index=False)
+
+## SHIT'S FUCKED RN BUT THIS IS IMPORTANT:
+"""
+here's the clothing item -> string process:
+join col "ClothGroup"/690e3379 from ItemParam with column "Label" in ItemClothGroup
+join col UniqueID from ItemClothGroup with the "Label" in the STR_OutfitGroupName files
+
+Basically there's a many rows in ItemParam to one label in clothing strings relationship.
+But for item strings it should be a one to one relationship
+"""
+# Join ItemClothGroup to ItemParam in prep for clothing strings
+clothGroup = pd.read_csv('data/csvs/ItemClothGroup.csv')
+clothGroup['Label'] = clothGroup['Label'].map(lambda label: label.strip('\''))
+clothGroup.rename(columns={'UniqueID': 'ClothGroup ID', 'Label': 'Label_ClothGroup', 'Name': 'Name_CG'}, inplace=True)
+
+clothSTR = sv.getClothingStrings()
+
+print('before merge:')
+print(clothGroup.shape)
+print(clothSTR.shape)
+
+clothGroup.to_csv(r'testing.csv', index=False)
+clothSTR.to_csv(r'shitme.csv', index=False)
+clothGroup = clothGroup.merge(clothSTR, on='ClothGroup ID', how='left')
+
+print('after merge:')
+print(clothGroup.shape)
+print(clothSTR.shape)
+
+clothGroup.to_csv(r'testing2.csv', index=False)
+
+# ItemParam = ItemParam.merge(clothGroup, left_on='ClothGroup', right_on='Label_ClothGroup')
+
+# Clothing strings
+
+# ItemParam = ItemParam.merge(clothSTR, left_on='ClothGroup ID', right_on='UniqueID')
+
+# print(ItemParam.shape)
+# print(ItemParam.tail)
+# print(clothSTR.tail)
 
 # Name
-game_name = sp.getInGameNames()
-ItemParam = ItemParam.merge(game_name, left_on='Internal ID', right_on='label', how='left').drop('label', axis=1)
+# game_name = sp.getInGameNames()
+# ItemParam = ItemParam.merge(game_name, left_on='Internal ID', right_on='label', how='left').drop('label', axis=1)
 
-print(ItemParam.shape)
 # ItemParam[['Internal ID', 'Filename', 'Name']].to_csv(r'testing2.csv', index=False)
 """
 # FtrIcon / Storage Image
