@@ -11,7 +11,7 @@ VersionAdded = ['1.0.0',
                 '1.5.0']
 
 def stripString(df):
-    df['label'] = df['label'].map(lambda x: re.sub(r'[a-zA-Z_0]*', '', x))
+    df['label'] = df['label'].map(lambda x: re.sub(r'[a-zA-Z_]*', '', x))
     df['text'] = df['text'].map(lambda x: x.strip(' 	2\\0Ā촃Ȁ촃Ѐ촃촀'))
     return df
 
@@ -46,7 +46,7 @@ def getClothingStrings():
     clothingSTR = pd.concat([pd.read_csv(f'data/string/outfit/groupname/{file}', dtype=object) for file in clothing])
     
     # Strip label to ID only and remove yucky chars from name string
-    clothingSTR = stripString(clothingSTR)
+    # clothingSTR = stripString(clothingSTR)
     
     # Cast label to int64
     clothingSTR = clothingSTR.astype({'label': 'int64'})
