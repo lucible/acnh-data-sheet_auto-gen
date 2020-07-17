@@ -21,12 +21,8 @@ def getItemStrings():
     # Get object name strings
     itemSTR = pd.concat([pd.read_csv(f'data/string/item/{file}', dtype=object) for file in items])
 
-    # print(itemSTR.shape)
-
     # Remove object plural strings
-    itemSTR.drop(itemSTR[itemSTR['label'].str.endswith('_pl').fillna(True)].index, inplace=True)
-
-    # print(itemSTR.shape)
+    itemSTR = itemSTR[~itemSTR['label'].str.endswith('_pl').fillna('')]
     
     # Strip label to ID only and remove yucky chars from name string
     itemSTR = stripString(itemSTR)
@@ -34,9 +30,9 @@ def getItemStrings():
     # Cast label to int64
     itemSTR = itemSTR.astype({'label': 'int64'})
     
-    # Rename column 'text' to 'Name'
-    itemSTR.rename(columns={'text': 'Name_Items', 'label': 'ItemSTR ID'}, inplace=True)
-    
+    # Rename columns
+    itemSTR.rename(columns={'text': 'Name_Items', 'label': 'Internal ID'}, inplace=True)
+
     return itemSTR
 
 def getClothingStrings():

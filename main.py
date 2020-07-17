@@ -26,12 +26,11 @@ clothGroup = clothGroup.merge(clothSTR, on='ClothGroup ID', how='left')
 # Merge clothing strings into ItemParam
 ItemParam = ItemParam.merge(clothGroup, left_on='ClothGroup', right_on='Label_ClothGroup')
 
+# Merge item strings into ItemParam
+itemSTR = sv.getItemStrings()
+ItemParam = ItemParam.merge(itemSTR, on='Internal ID', how='left')
 
-# Name
-# game_name = sp.getInGameNames()
-# ItemParam = ItemParam.merge(game_name, left_on='Internal ID', right_on='label', how='left').drop('label', axis=1)
-
-# ItemParam[['Internal ID', 'Filename', 'Name']].to_csv(r'testing2.csv', index=False)
+# ItemParam[['Internal ID', 'Filename', 'Name_Items', 'Name_Clothing']].to_csv(r'testing.csv', index=False)
 """
 # FtrIcon / Storage Image
 ItemParam['FtrIcon'] = ItemParam['Filename'].map(lambda x: f'=IMAGE("https://acnhcdn.com/latest/FtrIcon/{x}.png")')
