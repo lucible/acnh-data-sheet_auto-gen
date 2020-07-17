@@ -14,37 +14,18 @@ ItemParam['Filename'] = ItemParam['Filename'].map(lambda Filename: Filename.stri
 
 print(ItemParam.shape)
 
-## SHIT'S FUCKED RN BUT THIS IS IMPORTANT:
-"""
-here's the clothing item -> string process:
-join col "ClothGroup"/690e3379 from ItemParam with column "Label" in ItemClothGroup
-join col UniqueID from ItemClothGroup with the "Label" in the STR_OutfitGroupName files
-
-Basically there's a many rows in ItemParam to one label in clothing strings relationship.
-But for item strings it should be a one to one relationship
-"""
-# Join ItemClothGroup to ItemParam in prep for clothing strings
+# Import ItemClothGroup & prep for data merge
 clothGroup = pd.read_csv('data/csvs/ItemClothGroup.csv')
 clothGroup['Label'] = clothGroup['Label'].map(lambda label: label.strip('\''))
 clothGroup.rename(columns={'UniqueID': 'ClothGroup ID', 'Label': 'Label_ClothGroup', 'Name': 'Name_CG'}, inplace=True)
 
+# Merge clothing strings with ItemClothGroup
 clothSTR = sv.getClothingStrings()
-
 clothGroup = clothGroup.merge(clothSTR, on='ClothGroup ID', how='left')
 
-print(clothGroup.tail)
+# Merge clothing strings into ItemParam
+ItemParam = ItemParam.merge(clothGroup, left_on='ClothGroup', right_on='Label_ClothGroup')
 
-clothGroup.to_csv(r'testing2.csv', index=False)
-
-# ItemParam = ItemParam.merge(clothGroup, left_on='ClothGroup', right_on='Label_ClothGroup')
-
-# Clothing strings
-
-# ItemParam = ItemParam.merge(clothSTR, left_on='ClothGroup ID', right_on='UniqueID')
-
-# print(ItemParam.shape)
-# print(ItemParam.tail)
-# print(clothSTR.tail)
 
 # Name
 # game_name = sp.getInGameNames()
