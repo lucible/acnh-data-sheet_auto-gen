@@ -34,6 +34,9 @@ ItemParam = ItemParam.merge(itemSTR, on='Internal ID', how='left')
 ItemParam[['Name_Clothing', 'Name_Items']] = ItemParam[['Name_Clothing', 'Name_Items']].fillna('')
 ItemParam['Name'] = ItemParam['Name_Clothing'].astype(str) + ItemParam['Name_Items'].astype(str)
 
+print('ClothGroup ID')
+print(ItemParam['Internal ID'])
+
 # ItemParam[['Internal ID', 'Filename', 'Name']].to_csv(r'testing.csv', index=False)
 
 # FtrIcon / Storage Image
@@ -57,7 +60,7 @@ ItemParam.rename(columns={'Color1': 'Color 1', 'Color2': 'Color 2'}, inplace=Tru
 
 print(ItemParam.shape)
 
-# Size
+# Size & Size Category
 size = pd.read_csv('data/sheet-values/Size.csv')
 ItemParam = ItemParam.merge(size, on='ItemSize')
 
@@ -99,6 +102,13 @@ ItemParam = ItemParam.merge(version_added.rename('Version Added'), left_on='Item
 
 print(ItemParam.shape)
 
+# Nook Miles
+
+NookMilesFrom = ['Fence', 'MileExchangeLicense', 'MileExchangeNsoPresent', 'MileExchangeOnce', 'MileExchangePhoneCase', 'MileExchangePocket40', 'MileExchangeRecipe1', 'MileExchangeRecipe2', 'MileExchangeRecipe3', 'MileExchangeRecipe4', 'MileExchangeRecipe5', 'SonkatsuReward2', 'SonkatsuRewardShop', 'SonkatsuRewardTent']
+ItemParam[ItemParam['ItemFrom'].isin(NookMilesFrom)].to_csv(r'NookMilesItems.csv', index=False)
+
+print(ItemParam['Internal ID'])
+
 #####################################
 ## CONSTRUCT HOUSEWARES DATA FRAME ##
 #####################################
@@ -119,15 +129,92 @@ print(housewares_final.tail())
 ## CONSTRUCT RUGS DATA FRAME ##
 ###############################
 
-#rugs = ItemParam[ItemParam['ItemUICategory']=='RoomFloor']
+rugs = ItemParam[ItemParam['ItemUICategory']=='Ceiling_Rug'].copy()
 
-# rugs.rename(columns={'FtrIcon': 'Image'}, inplace=True)
+rugs.rename(columns={'FtrIcon': 'Image'}, inplace=True)
 
-# tab_rugs = ['Name', 'Image', 'DIY', 'Buy', 'Sell', 'Color 1', 'Color 2', 'Size', 'Size Category',
-#             'Miles Price', 'Source', 'Source Notes', 'HHA Base', 'HHA Concept 1', 'HHA Concept 2',
-#             'HHA Series', 'Tag', 'Catalog', 'Version Added', 'Version Unlocked', 'Filename',
-#             'Internal ID', 'Unique Entry ID']
+# print(rugs[['ItemSize', 'Size', 'Filename', 'Size Category']].tail())
 
-# rugs_final = pd.concat([rugs.pop(item) for item in tab_rugs], axis=1)
+# rugs[['ItemSize', 'Size', 'Filename']].to_csv(r'testing.csv', index=False)
 
-# print(rugs_final.tail())
+""" tab_rugs = ['Name', 'Image', 'DIY', 'Buy', 'Sell', 'Color 1', 'Color 2', 'Size', 'Size Category',
+            'Miles Price', 'Source', 'Source Notes', 'HHA Base', 'HHA Concept 1', 'HHA Concept 2',
+            'HHA Series', 'Tag', 'Catalog', 'Version Added', 'Version Unlocked', 'Filename',
+            'Internal ID', 'Unique Entry ID']
+
+rugs_final = pd.concat([rugs.pop(item) for item in tab_rugs], axis=1)
+
+print(rugs_final.tail()) """
+
+print('Clothing shapes start here:')
+
+# Tops
+tops = ItemParam[ItemParam['ItemKind']=='Tops'].copy()
+print(tops['Internal ID'])
+print(tops.shape)
+
+# Bottoms
+bottoms = ItemParam[ItemParam['ItemKind']=='Bottoms'].copy()
+print(bottoms.shape)
+
+# Dress-Up
+dressup = ItemParam[ItemParam['ItemKind']=='OnePiece'].copy()
+print(dressup.shape)
+
+# Headwear
+headwear = ItemParam[ItemParam['ItemKind'].isin(['Cap', 'Helmet'])].copy()
+print(headwear.shape)
+
+# Accessories
+accessories = ItemParam[ItemParam['ItemKind']=='Accessory'].copy()
+print(accessories.shape)
+
+# Socks
+socks = ItemParam[ItemParam['ItemKind']=='Socks'].copy()
+print(socks.shape)
+
+# Shoes
+shoes = ItemParam[ItemParam['ItemKind']=='Shoes'].copy()
+print(shoes.shape)
+
+# Bags
+bags = ItemParam[ItemParam['ItemKind']=='Bag'].copy()
+print(bags.shape)
+
+# Umbrellas
+umbrellas = ItemParam[ItemParam['ItemKind']=='Umbrella'].copy()
+print(umbrellas.shape)
+
+# Clothing Other (MarineSuits)
+marinesuits = ItemParam[ItemParam['ItemKind']=='MarineSuit'].copy()
+print(marinesuits.shape)
+
+tops = tops[['Internal ID', 'ClothGroup ID']]
+bottoms = bottoms[['Internal ID', 'ClothGroup ID']]
+dressup = dressup[['Internal ID', 'ClothGroup ID']]
+headwear = headwear[['Internal ID', 'ClothGroup ID']]
+accessories = accessories[['Internal ID', 'ClothGroup ID']]
+socks = socks[['Internal ID', 'ClothGroup ID']]
+shoes = shoes[['Internal ID', 'ClothGroup ID']]
+bags = bags[['Internal ID', 'ClothGroup ID']]
+umbrellas = umbrellas[['Internal ID', 'ClothGroup ID']]
+marinesuits = marinesuits[['Internal ID', 'ClothGroup ID']]
+
+# ============================================================
+# Create a Pandas Excel writer using XlsxWriter as the engine.
+writer = pd.ExcelWriter('clothing_clothGroups.xlsx', engine='xlsxwriter')
+
+# Write each dataframe to a different worksheet.
+tops.to_excel(writer, sheet_name='Tops')
+bottoms.to_excel(writer, sheet_name='Bottoms')
+dressup.to_excel(writer, sheet_name='Dress-Up')
+headwear.to_excel(writer, sheet_name='Headwear')
+accessories.to_excel(writer, sheet_name='Accessories')
+socks.to_excel(writer, sheet_name='Socks')
+shoes.to_excel(writer, sheet_name='Shoes')
+bags.to_excel(writer, sheet_name='Bags')
+umbrellas.to_excel(writer, sheet_name='Umbrellas')
+marinesuits.to_excel(writer, sheet_name='Clothing Other')
+
+# Close the Pandas Excel writer and output the Excel file.
+writer.save()

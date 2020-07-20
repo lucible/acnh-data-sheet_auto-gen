@@ -51,3 +51,7 @@ def getClothingStrings():
     clothingSTR.rename(columns={'text': 'Name_Clothing', 'label' : 'ClothGroup ID'}, inplace=True)
     
     return clothingSTR
+
+# def calculateNookMilesPrice(ItemFrom):
+    # df has columns Filename, ItemFrom, Price
+    # df = ItemFrom value
