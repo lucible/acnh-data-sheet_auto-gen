@@ -34,8 +34,8 @@ ItemParam = ItemParam.merge(itemSTR, on='Internal ID', how='left')
 ItemParam[['Name_Clothing', 'Name_Items']] = ItemParam[['Name_Clothing', 'Name_Items']].fillna('')
 ItemParam['Name'] = ItemParam['Name_Clothing'].astype(str) + ItemParam['Name_Items'].astype(str)
 
-print('ClothGroup ID')
-print(ItemParam['Internal ID'])
+#print('ClothGroup ID')
+#print(ItemParam['Internal ID'])
 
 # ItemParam[['Internal ID', 'Filename', 'Name']].to_csv(r'testing.csv', index=False)
 
@@ -43,6 +43,10 @@ print(ItemParam['Internal ID'])
 ItemParam['FtrIcon'] = ItemParam['Filename'].map(lambda x: f'=IMAGE("https://acnhcdn.com/latest/FtrIcon/{x}.png")')
 
 print(ItemParam.shape)
+
+# ClosetIcon / Closet Image
+
+ItemParam['ClosetIcon'] = ItemParam['Filename'].map(lambda x: f'=IMAGE("https://acnhcdn.com/latest/ClosetIcon/{x}.png")')
 
 # DIY
 ItemParam['DIY'] = ItemParam['CaptureDiyIcon'].map(lambda x: 'Yes' if x == 1 else 'No')
@@ -107,7 +111,7 @@ print(ItemParam.shape)
 NookMilesFrom = ['Fence', 'MileExchangeLicense', 'MileExchangeNsoPresent', 'MileExchangeOnce', 'MileExchangePhoneCase', 'MileExchangePocket40', 'MileExchangeRecipe1', 'MileExchangeRecipe2', 'MileExchangeRecipe3', 'MileExchangeRecipe4', 'MileExchangeRecipe5', 'SonkatsuReward2', 'SonkatsuRewardShop', 'SonkatsuRewardTent']
 ItemParam[ItemParam['ItemFrom'].isin(NookMilesFrom)].to_csv(r'NookMilesItems.csv', index=False)
 
-print(ItemParam['Internal ID'])
+# print(ItemParam['Internal ID'])
 
 #####################################
 ## CONSTRUCT HOUSEWARES DATA FRAME ##
@@ -146,6 +150,7 @@ rugs_final = pd.concat([rugs.pop(item) for item in tab_rugs], axis=1)
 
 print(rugs_final.tail()) """
 
+""" CLOTHING TESTING
 print('Clothing shapes start here:')
 
 # Tops
@@ -218,3 +223,12 @@ marinesuits.to_excel(writer, sheet_name='Clothing Other')
 
 # Close the Pandas Excel writer and output the Excel file.
 writer.save()
+"""
+
+## JANKY 1.4.0 UPDATE CSV FILE
+
+newItems = ItemParam[ItemParam['Version Added']=='1.4.0'].copy()
+
+print(newItems)
+
+newItems[['ItemUICategory', 'Version Added', 'Filename', 'Internal ID', 'Name', 'ClosetIcon', 'FtrIcon', 'DIY', 'Buy', 'Sell', 'Color 1', 'Color 2', 'Size', 'Size Category', 'Surface', 'HHA Concept 1', 'HHA Concept 2', 'Catalog']].to_csv(r'newItems.csv', index = False)
