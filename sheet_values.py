@@ -98,5 +98,7 @@ def labelJuneBride(row):
 def wallpaperVFX(row):
     if row['ResName'].startswith('\'RoomSpWall'):
         return 'Yes'
+    elif row['ResName'].startswith('\'RoomSpFloor'):
+        return 'Yes'
     else:
         return 'No'

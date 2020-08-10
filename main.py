@@ -143,10 +143,10 @@ ItemParam['Currency_HC'] = ItemParam.apply(sv.labelJuneBride, axis=1)
 ItemParam[['Exchange_NM', 'Exchange_HC', 'Currency_NM', 'Currency_HC']] = ItemParam[['Exchange_NM', 'Exchange_HC', 'Currency_NM', 'Currency_HC']].fillna('')
 
 # Merge Nook Miles & Heart Crystals into Exchange & Exchange Currency columns
-ItemParam['Exchange'] = ItemParam['Exchange_NM'].astype(str) + ItemParam['Exchange_HC'].astype(str)
+ItemParam['Exchange Price'] = ItemParam['Exchange_NM'].astype(str) + ItemParam['Exchange_HC'].astype(str)
 ItemParam['Exchange Currency'] = ItemParam['Currency_NM'].astype(str) + ItemParam['Currency_HC'].astype(str)
 
-ItemParam[['Exchange', 'Exchange Currency']] = ItemParam[['Exchange', 'Exchange Currency']].replace(r'^\s*$', 'NA', regex=True)
+ItemParam[['Exchange Price', 'Exchange Currency']] = ItemParam[['Exchange Price', 'Exchange Currency']].replace(r'^\s*$', 'NA', regex=True)
 
 print(ItemParam.shape)
 
@@ -227,7 +227,7 @@ wallpaper = ItemParam[ItemParam['ItemUICategory']=='RoomWall'].copy()
 
 wallpaper.rename(columns={'FtrIcon': 'Image'}, inplace=True)
 
-tab_wallpaper = ['Name', 'Image', 'VFX', 'VFX Type', 'DIY', 'Buy', 'Sell', 'Color 1', 'Color 2', 'Exchange',
+tab_wallpaper = ['Name', 'Image', 'VFX', 'VFX Type', 'DIY', 'Buy', 'Sell', 'Color 1', 'Color 2', 'Exchange Price',
                  'Exchange Currency', 'ItemFrom', 'Source Notes', 'Window Type', 'Window Color', 'Pane Type',
                  'Curtain Type', 'Curtain Color', 'Ceiling Type', 'HHA Base Points', 'HHA Concept 1',
                  'HHA Concept 2', 'HHA Series', 'Tag', 'Catalog', 'Version Added', 'Version Unlocked', 'Filename',
@@ -236,7 +236,25 @@ tab_wallpaper = ['Name', 'Image', 'VFX', 'VFX Type', 'DIY', 'Buy', 'Sell', 'Colo
 wallpaper_final = pd.concat([wallpaper.pop(item) for item in tab_wallpaper], axis=1)
 wallpaper_final.sort_values(by=['Name'], inplace=True)
 
-wallpaper_final.to_csv(r'Wallpaper.csv', index=False)
+# wallpaper_final.to_csv(r'Wallpaper.csv', index=False)
+
+#################################
+## CONSTRUCT FLOORS DATA FRAME ##
+#################################
+
+floors = ItemParam[ItemParam['ItemUICategory']=='RoomFloor'].copy()
+
+floors.rename(columns={'FtrIcon': 'Image'}, inplace=True)
+
+tab_floors = ['Name', 'Image', 'VFX', 'DIY', 'Buy', 'Sell', 'Color 1', 'Color 2', 'Exchange Price',
+            'Exchange Currency', 'ItemFrom', 'Source Notes', 'HHA Base Points', 'HHA Concept 1',
+            'HHA Concept 2', 'HHA Series', 'Tag', 'Catalog', 'Version Added', 'Version Unlocked', 'Filename',
+            'Internal ID', 'Unique Entry ID']
+
+floors_final = pd.concat([floors.pop(item) for item in tab_floors], axis=1)
+floors_final.sort_values(by=['Name'], inplace=True)
+
+# floors_final.to_csv(r'Floors.csv', index=False)
 
 ###############################
 ## CONSTRUCT RUGS DATA FRAME ##
@@ -247,7 +265,7 @@ rugs = ItemParam[ItemParam['ItemUICategory']=='Ceiling_Rug'].copy()
 rugs.rename(columns={'FtrIcon': 'Image'}, inplace=True)
 
 tab_rugs = ['Name', 'Image', 'DIY', 'Buy', 'Sell', 'Color 1', 'Color 2', 'Size', 'Size Category',
-            'Exchange', 'Exchange Currency', 'ItemFrom', 'Source Notes', 'HHA Base Points', 'HHA Concept 1',
+            'Exchange Price', 'Exchange Currency', 'ItemFrom', 'Source Notes', 'HHA Base Points', 'HHA Concept 1',
             'HHA Concept 2', 'HHA Series', 'Tag', 'Catalog', 'Version Added', 'Version Unlocked', 'Filename',
             'Internal ID', 'Unique Entry ID']
 
