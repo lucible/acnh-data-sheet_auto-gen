@@ -166,6 +166,35 @@ ItemParam = ItemParam.merge(itemFrom, on='ItemFrom', how='left')
 
 print(ItemParam.shape)
 
+## WALLPAPER COLUMNS ##
+
+roomWallParam = pd.read_csv('data/csvs/RoomWallParam.csv')
+roomWallParam.replace({'Act': {'None': 'NA'}}, inplace=True)
+roomWallParam.rename(columns={'Act': 'VFX Type', 'ItemTableId': 'Internal ID'}, inplace=True)
+
+roomWindow = pd.read_csv('data/sheet-values/RoomWindow.csv')
+roomWallParam = roomWallParam.merge(roomWindow, on='WindowUniqueID', how='left')
+
+roomCurtain = pd.read_csv('data/sheet-values/RoomCurtain.csv')
+roomWallParam = roomWallParam.merge(roomCurtain, on='CurtainUniqueID', how='left')
+
+roomCurtainColor = pd.read_csv('data/sheet-values/RoomCurtainTex.csv')
+roomWallParam = roomWallParam.merge(roomCurtainColor, on='CurtainTexUniqueID', how='left')
+
+roomCeiling = pd.read_csv('data/sheet-values/RoomCeiling.csv')
+roomWallParam = roomWallParam.merge(roomCeiling, on='CeilingUniqueID', how='left')
+
+toDrop = ['AO','Light','Price','ArchUniqueID','CeilingUniqueID','CurtainTexUniqueID','CurtainUniqueID','UniqueID','ItemName','ResourceName','TextureWindow','WindowUniqueID']
+roomWallParam.drop(columns=toDrop, inplace=True)
+
+roomWallParam[['Window Color', 'Pane Type', 'Curtain Color']] = roomWallParam[['Window Color', 'Pane Type', 'Curtain Color']].fillna('NA')
+
+ItemParam['VFX'] = ItemParam.apply(sv.wallpaperVFX, axis=1)
+
+ItemParam = ItemParam.merge(roomWallParam, on='Internal ID', how='left')
+
+print(ItemParam.shape)
+
 # Add empty columns to match spreadsheet
 ItemParam['Source Notes'] = ''
 ItemParam['Version Unlocked'] = ''
@@ -189,6 +218,26 @@ print(housewares_final.tail())
 
 # housewares[['ItemUIFurnitureCategory']].to_csv(r'testing.csv', index = False)
 """
+
+####################################
+## CONSTRUCT WALLPAPER DATA FRAME ##
+####################################
+
+wallpaper = ItemParam[ItemParam['ItemUICategory']=='RoomWall'].copy()
+
+wallpaper.rename(columns={'FtrIcon': 'Image'}, inplace=True)
+
+tab_wallpaper = ['Name', 'Image', 'VFX', 'VFX Type', 'DIY', 'Buy', 'Sell', 'Color 1', 'Color 2', 'Exchange',
+                 'Exchange Currency', 'ItemFrom', 'Source Notes', 'Window Type', 'Window Color', 'Pane Type',
+                 'Curtain Type', 'Curtain Color', 'Ceiling Type', 'HHA Base Points', 'HHA Concept 1',
+                 'HHA Concept 2', 'HHA Series', 'Tag', 'Catalog', 'Version Added', 'Version Unlocked', 'Filename',
+                 'Internal ID', 'Unique Entry ID']
+
+wallpaper_final = pd.concat([wallpaper.pop(item) for item in tab_wallpaper], axis=1)
+wallpaper_final.sort_values(by=['Name'], inplace=True)
+
+wallpaper_final.to_csv(r'Wallpaper.csv', index=False)
+
 ###############################
 ## CONSTRUCT RUGS DATA FRAME ##
 ###############################

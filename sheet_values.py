@@ -94,3 +94,9 @@ def labelJuneBride(row):
         return ''
     else:
         return 'Heart Crystals'
+
+def wallpaperVFX(row):
+    if row['ResName'].startswith('\'RoomSpWall'):
+        return 'Yes'
+    else:
+        return 'No'
