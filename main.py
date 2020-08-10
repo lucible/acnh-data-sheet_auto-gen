@@ -90,6 +90,20 @@ ItemParam = ItemParam.merge(situation2, on='ItemHHASituation2', how='left')
 
 print(ItemParam.shape)
 
+# HHA Series
+hhaSeries = pd.read_csv('data/sheet-values/HHATheme.csv')
+ItemParam = ItemParam.merge(hhaSeries, on='ItemHHATheme', how='left')
+
+print(ItemParam.shape)
+
+# HHA Set
+hhaSet = pd.read_csv('data/sheet-values/HHASet.csv')
+ItemParam = ItemParam.merge(hhaSet, on='ItemHHASet', how='left')
+
+print(ItemParam.shape)
+
+# ItemParam[['ItemHHASet']].to_csv(r'ItemParam.csv', index=False)
+
 # Tag
 tag = pd.read_csv('data/sheet-values/Tag.csv')
 ItemParam = ItemParam.merge(tag, on='ItemUIFurnitureCategory', how='left')
@@ -112,6 +126,10 @@ print(ItemParam.shape)
 ItemParam['Exchange_NM'] = ItemParam.apply(sv.calculateNookMilesPrice, axis=1)
 ItemParam['Currency_NM'] = ItemParam.apply(sv.labelNookMiles, axis=1)
 
+# NookMilesFrom = ['Fence', 'MileExchangeLicense', 'MileExchangeNsoPresent', 'MileExchangeOnce', 'MileExchangePhoneCase', 'MileExchangePocket40', 'MileExchangeRecipe1', 'MileExchangeRecipe2', 'MileExchangeRecipe3', 'MileExchangeRecipe4', 'MileExchangeRecipe5', 'SonkatsuReward2', 'SonkatsuRewardShop', 'SonkatsuRewardTent']
+# test = ItemParam[ItemParam['ItemFrom'].isin(NookMilesFrom)]
+# test[['Name', 'Exchange_NM', 'Currency_NM', 'Filename']].to_csv(r'NookMilesItems.csv', index=False)
+
 # Import and prep Heart Crystal info
 juneBride = pd.read_csv('data/csvs/CalendarEventJuneBrideExchange.csv')
 juneBride.drop(columns=['UniqueID', 'DispInteriorMode', 'JuneBrideProgress'], inplace=True)
@@ -128,11 +146,30 @@ ItemParam[['Exchange_NM', 'Exchange_HC', 'Currency_NM', 'Currency_HC']] = ItemPa
 ItemParam['Exchange'] = ItemParam['Exchange_NM'].astype(str) + ItemParam['Exchange_HC'].astype(str)
 ItemParam['Exchange Currency'] = ItemParam['Currency_NM'].astype(str) + ItemParam['Currency_HC'].astype(str)
 
+ItemParam[['Exchange', 'Exchange Currency']] = ItemParam[['Exchange', 'Exchange Currency']].replace(r'^\s*$', 'NA', regex=True)
+
 print(ItemParam.shape)
 
-# NookMilesFrom = ['Fence', 'MileExchangeLicense', 'MileExchangeNsoPresent', 'MileExchangeOnce', 'MileExchangePhoneCase', 'MileExchangePocket40', 'MileExchangeRecipe1', 'MileExchangeRecipe2', 'MileExchangeRecipe3', 'MileExchangeRecipe4', 'MileExchangeRecipe5', 'SonkatsuReward2', 'SonkatsuRewardShop', 'SonkatsuRewardTent']
-# test = ItemParam[ItemParam['ItemFrom'].isin(NookMilesFrom)]
-# test[['Name', 'Exchange_NM', 'Currency_NM', 'Filename']].to_csv(r'NookMilesItems.csv', index=False)
+# HHA Base Points
+# ItemParam : ItemFrom > ItemFrom : UniqueID :: HHABaseScore
+
+# Import and prep HHA Base info
+itemFrom = pd.read_csv('data/csvs/ItemFrom.csv')
+itemFrom.drop(columns=['Name', 'UniqueID'], inplace=True)
+itemFrom.rename(columns={'Label': 'ItemFrom', 'HHABaseScore': 'HHA Base Points'}, inplace=True)
+itemFrom['ItemFrom'] = itemFrom['ItemFrom'].map(lambda x: x.strip('\''))
+
+# itemFrom.to_csv(r'ItemFrom.csv', index=False)
+
+# HHA Base Points column
+ItemParam = ItemParam.merge(itemFrom, on='ItemFrom', how='left')
+
+print(ItemParam.shape)
+
+# Add empty columns to match spreadsheet
+ItemParam['Source Notes'] = ''
+ItemParam['Version Unlocked'] = ''
+ItemParam['Unique Entry ID'] = ''
 
 # print(ItemParam['Internal ID'])
 
@@ -160,18 +197,15 @@ rugs = ItemParam[ItemParam['ItemUICategory']=='Ceiling_Rug'].copy()
 
 rugs.rename(columns={'FtrIcon': 'Image'}, inplace=True)
 
-# print(rugs[['ItemSize', 'Size', 'Filename', 'Size Category']].tail())
-
-# rugs[['ItemSize', 'Size', 'Filename']].to_csv(r'testing.csv', index=False)
-
-""" tab_rugs = ['Name', 'Image', 'DIY', 'Buy', 'Sell', 'Color 1', 'Color 2', 'Size', 'Size Category',
-            'Miles Price', 'Source', 'Source Notes', 'HHA Base', 'HHA Concept 1', 'HHA Concept 2',
-            'HHA Series', 'Tag', 'Catalog', 'Version Added', 'Version Unlocked', 'Filename',
+tab_rugs = ['Name', 'Image', 'DIY', 'Buy', 'Sell', 'Color 1', 'Color 2', 'Size', 'Size Category',
+            'Exchange', 'Exchange Currency', 'ItemFrom', 'Source Notes', 'HHA Base Points', 'HHA Concept 1',
+            'HHA Concept 2', 'HHA Series', 'Tag', 'Catalog', 'Version Added', 'Version Unlocked', 'Filename',
             'Internal ID', 'Unique Entry ID']
 
 rugs_final = pd.concat([rugs.pop(item) for item in tab_rugs], axis=1)
+rugs_final.sort_values(by=['Name'], inplace=True)
 
-print(rugs_final.tail()) """
+# rugs_final.to_csv(r'Rugs.csv', index=False)
 
 """ CLOTHING TESTING
 print('Clothing shapes start here:')
