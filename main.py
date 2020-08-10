@@ -199,6 +199,7 @@ print(ItemParam.shape)
 ItemParam['Source Notes'] = ''
 ItemParam['Version Unlocked'] = ''
 ItemParam['Unique Entry ID'] = ''
+ItemParam['Stack Size'] = ''
 
 # print(ItemParam['Internal ID'])
 
@@ -273,6 +274,22 @@ rugs_final = pd.concat([rugs.pop(item) for item in tab_rugs], axis=1)
 rugs_final.sort_values(by=['Name'], inplace=True)
 
 # rugs_final.to_csv(r'Rugs.csv', index=False)
+
+##################################
+## CONSTRUCT FENCING DATA FRAME ##
+##################################
+
+fencing = ItemParam[ItemParam['ItemKind']=='Fence'].copy()
+
+fencing.rename(columns={'FtrIcon': 'Image'}, inplace=True)
+
+tab_fencing = ['Name', 'Image', 'DIY', 'Stack Size', 'Buy', 'Sell', 'ItemFrom', 'Source Notes',
+			   'Version Added', 'Version Unlocked', 'Filename', 'Internal ID', 'Unique Entry ID']
+
+fencing_final = pd.concat([fencing.pop(item) for item in tab_fencing], axis=1)
+fencing_final.sort_values(by=['Name'], inplace=True)
+
+fencing_final.to_csv(r'Fencing.csv', index=False)
 
 """ CLOTHING TESTING
 print('Clothing shapes start here:')
