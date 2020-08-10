@@ -1,4 +1,5 @@
 import pandas as pd
+import math as m
 import re
 
 VersionAdded = ['1.0.0',
@@ -77,13 +78,19 @@ def calculateNookMilesPrice(row):
         13: dividedBy20
     }
     if NookMilesFrom.count(row['ItemFrom']) > 0:
-        func = switcher.get(NookMilesFrom.index(row['ItemFrom']), lambda: "NA")
+        func = switcher.get(NookMilesFrom.index(row['ItemFrom']), lambda: '')
         return func(row)
     else:
-        return "NA"
+        return ''
 
 def labelNookMiles(row):
-    if row['Exchange_NM'] == 'NA':
+    if row['Exchange_NM'] == '':
         return ''
     else:
         return 'Nook Miles'
+
+def labelJuneBride(row):
+    if m.isnan(row['Exchange_HC']):
+        return ''
+    else:
+        return 'Heart Crystals'

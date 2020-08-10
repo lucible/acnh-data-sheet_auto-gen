@@ -108,11 +108,27 @@ ItemParam = ItemParam.merge(version_added.rename('Version Added'), left_on='Item
 
 print(ItemParam.shape)
 
-# Nook Miles
+# Nook Miles Exchange & Currency columns
 ItemParam['Exchange_NM'] = ItemParam.apply(sv.calculateNookMilesPrice, axis=1)
 ItemParam['Currency_NM'] = ItemParam.apply(sv.labelNookMiles, axis=1)
 
-# Heart Crystals
+# Import and prep Heart Crystal info
+juneBride = pd.read_csv('data/csvs/CalendarEventJuneBrideExchange.csv')
+juneBride.drop(columns=['UniqueID', 'DispInteriorMode', 'JuneBrideProgress'], inplace=True)
+juneBride.rename(columns={'ExchangeItem': 'Internal ID', 'RequiredNum': 'Exchange_HC'}, inplace=True)
+
+# Heart Crystals Exchange & Currency columns
+ItemParam = ItemParam.merge(juneBride, on='Internal ID', how='left')
+ItemParam['Currency_HC'] = ItemParam.apply(sv.labelJuneBride, axis=1)
+
+# Fill NaN with empty string
+ItemParam[['Exchange_NM', 'Exchange_HC', 'Currency_NM', 'Currency_HC']] = ItemParam[['Exchange_NM', 'Exchange_HC', 'Currency_NM', 'Currency_HC']].fillna('')
+
+# Merge Nook Miles & Heart Crystals into Exchange & Exchange Currency columns
+ItemParam['Exchange'] = ItemParam['Exchange_NM'].astype(str) + ItemParam['Exchange_HC'].astype(str)
+ItemParam['Exchange Currency'] = ItemParam['Currency_NM'].astype(str) + ItemParam['Currency_HC'].astype(str)
+
+print(ItemParam.shape)
 
 # NookMilesFrom = ['Fence', 'MileExchangeLicense', 'MileExchangeNsoPresent', 'MileExchangeOnce', 'MileExchangePhoneCase', 'MileExchangePocket40', 'MileExchangeRecipe1', 'MileExchangeRecipe2', 'MileExchangeRecipe3', 'MileExchangeRecipe4', 'MileExchangeRecipe5', 'SonkatsuReward2', 'SonkatsuRewardShop', 'SonkatsuRewardTent']
 # test = ItemParam[ItemParam['ItemFrom'].isin(NookMilesFrom)]
