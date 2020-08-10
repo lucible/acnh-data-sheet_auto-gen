@@ -44,11 +44,11 @@ print(ItemParam.shape)
 # FtrIcon / Storage Image
 ItemParam['FtrIcon'] = ItemParam['Filename'].map(lambda x: f'=IMAGE("https://acnhcdn.com/latest/FtrIcon/{x}.png")')
 
-print(ItemParam.shape)
-
 # ClosetIcon / Closet Image
-
 ItemParam['ClosetIcon'] = ItemParam['Filename'].map(lambda x: f'=IMAGE("https://acnhcdn.com/latest/ClosetIcon/{x}.png")')
+
+# DIYRecipeIcon / DIY Recipe Image
+ItemParam['DIYRecipeIcon'] = ItemParam['Filename'].map(lambda x: f'=IMAGE("https://acnhcdn.com/latest/DIYRecipeIcon/{x}.png")')
 
 # DIY
 ItemParam['DIY'] = ItemParam['CaptureDiyIcon'].map(lambda x: 'Yes' if x == 1 else 'No')
@@ -289,7 +289,22 @@ tab_fencing = ['Name', 'Image', 'DIY', 'Stack Size', 'Buy', 'Sell', 'ItemFrom', 
 fencing_final = pd.concat([fencing.pop(item) for item in tab_fencing], axis=1)
 fencing_final.sort_values(by=['Name'], inplace=True)
 
-fencing_final.to_csv(r'Fencing.csv', index=False)
+# fencing_final.to_csv(r'Fencing.csv', index=False)
+
+##################################
+## CONSTRUCT RECIPES DATA FRAME ##
+##################################
+
+recipes = ItemParam[ItemParam['DIY']=='Yes'].copy()
+
+recipes.rename(columns={'DIYRecipeIcon': 'Image', 'Internal ID': 'Crafted Item Internal ID'}, inplace=True)
+
+tab_recipes = ['Name', 'Image', 'Version Added', 'Crafted Item Internal ID', 'Filename']
+
+recipes_final = pd.concat([recipes.pop(item) for item in tab_recipes], axis=1)
+recipes_final.sort_values(by=['Name'], inplace=True)
+
+# recipes_final.to_csv(r'Recipes.csv', index=False)
 
 """ CLOTHING TESTING
 print('Clothing shapes start here:')
