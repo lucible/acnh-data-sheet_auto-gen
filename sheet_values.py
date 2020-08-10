@@ -52,6 +52,38 @@ def getClothingStrings():
     
     return clothingSTR
 
-# def calculateNookMilesPrice(ItemFrom):
-    # df has columns Filename, ItemFrom, Price
-    # df = ItemFrom value
+def dividedBy20(row):
+    if row['Filename'] == 'BellExchangeTicket':
+        return 500
+    else:
+        return row['Buy'] / 20
+
+def calculateNookMilesPrice(row):
+    NookMilesFrom = ['Fence', 'MileExchangeLicense', 'MileExchangeNsoPresent', 'MileExchangeOnce', 'MileExchangePhoneCase', 'MileExchangePocket40', 'MileExchangeRecipe1', 'MileExchangeRecipe2', 'MileExchangeRecipe3', 'MileExchangeRecipe4', 'MileExchangeRecipe5', 'SonkatsuReward2', 'SonkatsuRewardShop', 'SonkatsuRewardTent']
+    switcher = {
+	    0: (lambda x: 1000),
+        1: dividedBy20,
+        2: dividedBy20,
+        3: dividedBy20,
+        4: dividedBy20,
+        5: dividedBy20,
+        6: (lambda x: 800),
+        7: (lambda x: 1500),
+        8: (lambda x: 2000),
+        9: (lambda x: 3000),
+        10: (lambda x: 5000),
+        11: dividedBy20,
+        12: dividedBy20,
+        13: dividedBy20
+    }
+    if NookMilesFrom.count(row['ItemFrom']) > 0:
+        func = switcher.get(NookMilesFrom.index(row['ItemFrom']), lambda: "NA")
+        return func(row)
+    else:
+        return "NA"
+
+def labelNookMiles(row):
+    if row['Exchange_NM'] == 'NA':
+        return ''
+    else:
+        return 'Nook Miles'

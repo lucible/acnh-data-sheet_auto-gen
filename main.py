@@ -24,7 +24,7 @@ clothSTR = sv.getClothingStrings()
 clothGroup = clothGroup.merge(clothSTR, on='ClothGroup ID', how='left')
 
 # Merge clothing strings into ItemParam
-ItemParam = ItemParam.merge(clothGroup, left_on='ClothGroup', right_on='Label_ClothGroup')
+ItemParam = ItemParam.merge(clothGroup, left_on='ClothGroup', right_on='Label_ClothGroup', how='left')
 
 # Merge item strings into ItemParam
 itemSTR = sv.getItemStrings()
@@ -33,6 +33,8 @@ ItemParam = ItemParam.merge(itemSTR, on='Internal ID', how='left')
 # Fill NaN with empty string & merge into single Name column
 ItemParam[['Name_Clothing', 'Name_Items']] = ItemParam[['Name_Clothing', 'Name_Items']].fillna('')
 ItemParam['Name'] = ItemParam['Name_Clothing'].astype(str) + ItemParam['Name_Items'].astype(str)
+
+print(ItemParam.shape)
 
 #print('ClothGroup ID')
 #print(ItemParam['Internal ID'])
@@ -107,9 +109,14 @@ ItemParam = ItemParam.merge(version_added.rename('Version Added'), left_on='Item
 print(ItemParam.shape)
 
 # Nook Miles
+ItemParam['Exchange_NM'] = ItemParam.apply(sv.calculateNookMilesPrice, axis=1)
+ItemParam['Currency_NM'] = ItemParam.apply(sv.labelNookMiles, axis=1)
 
-NookMilesFrom = ['Fence', 'MileExchangeLicense', 'MileExchangeNsoPresent', 'MileExchangeOnce', 'MileExchangePhoneCase', 'MileExchangePocket40', 'MileExchangeRecipe1', 'MileExchangeRecipe2', 'MileExchangeRecipe3', 'MileExchangeRecipe4', 'MileExchangeRecipe5', 'SonkatsuReward2', 'SonkatsuRewardShop', 'SonkatsuRewardTent']
-ItemParam[ItemParam['ItemFrom'].isin(NookMilesFrom)].to_csv(r'NookMilesItems.csv', index=False)
+# Heart Crystals
+
+# NookMilesFrom = ['Fence', 'MileExchangeLicense', 'MileExchangeNsoPresent', 'MileExchangeOnce', 'MileExchangePhoneCase', 'MileExchangePocket40', 'MileExchangeRecipe1', 'MileExchangeRecipe2', 'MileExchangeRecipe3', 'MileExchangeRecipe4', 'MileExchangeRecipe5', 'SonkatsuReward2', 'SonkatsuRewardShop', 'SonkatsuRewardTent']
+# test = ItemParam[ItemParam['ItemFrom'].isin(NookMilesFrom)]
+# test[['Name', 'Exchange_NM', 'Currency_NM', 'Filename']].to_csv(r'NookMilesItems.csv', index=False)
 
 # print(ItemParam['Internal ID'])
 
@@ -223,7 +230,7 @@ marinesuits.to_excel(writer, sheet_name='Clothing Other')
 
 # Close the Pandas Excel writer and output the Excel file.
 writer.save()
-"""
+
 
 ## JANKY 1.4.0 UPDATE CSV FILE
 
@@ -232,3 +239,4 @@ newItems = ItemParam[ItemParam['Version Added']=='1.4.0'].copy()
 print(newItems)
 
 newItems[['ItemUICategory', 'Version Added', 'Filename', 'Internal ID', 'Name', 'ClosetIcon', 'FtrIcon', 'DIY', 'Buy', 'Sell', 'Color 1', 'Color 2', 'Size', 'Size Category', 'Surface', 'HHA Concept 1', 'HHA Concept 2', 'Catalog']].to_csv(r'newItems.csv', index = False)
+"""
