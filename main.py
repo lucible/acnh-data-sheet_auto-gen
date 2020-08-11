@@ -4,6 +4,8 @@ import sheet_values as sv
 
 ItemParam = pd.read_csv('data/csvs/ItemParam.csv')
 
+print(ItemParam.shape)
+
 ########################################
 ## ADD UNIVERSAL COLUMNS TO ITEMPARAM ##
 ########################################
@@ -14,17 +16,25 @@ ItemParam['Filename'] = ItemParam['Filename'].map(lambda Filename: Filename.stri
 
 print(ItemParam.shape)
 
-# Import ItemClothGroup & prep for data merge
+# Import ItemClothGroup & normalize data
 clothGroup = pd.read_csv('data/csvs/ItemClothGroup.csv')
 clothGroup['Label'] = clothGroup['Label'].map(lambda label: label.strip('\''))
 clothGroup.rename(columns={'UniqueID': 'ClothGroup ID', 'Label': 'Label_ClothGroup', 'Name': 'Name_CG'}, inplace=True)
 
-# Merge clothing strings with ItemClothGroup
+# Merge ItemClothGroup with clothing strings
 clothSTR = sv.getClothingStrings()
 clothGroup = clothGroup.merge(clothSTR, on='ClothGroup ID', how='left')
+clothGroup.replace({'Label_ClothGroup': {'ShoesKneeEngineerboots_': 'ShoesKneeEngineerboots',
+                                         'TopsTexTopCoatLPoncho': 'TopsTexTopCoatLPompom',
+                                         'TopsTexTopCoatHWorkapron': 'TopsTexTopCoatLWorkapron',
+                                         'TopsTexTopCoatHDiner': 'TopsTexTopCoatLDiner',
+                                         'TopsTexOnepieceBlongLHippie': 'TopsTexTopCoatLPoncho'}}, inplace=True)
 
-# Merge clothing strings into ItemParam
-ItemParam = ItemParam.merge(clothGroup, left_on='ClothGroup', right_on='Label_ClothGroup', how='left')
+# Create Label_ClothGroup column from Filename column
+ItemParam['Label_ClothGroup'] = ItemParam['Filename'].apply(sv.filenameToClothGroup, args=(clothGroup['Label_ClothGroup'],))
+
+# Merge ItemParam with clothing strings
+ItemParam = ItemParam.merge(clothGroup, left_on='Label_ClothGroup', right_on='Label_ClothGroup', how='left')
 
 # Merge item strings into ItemParam
 itemSTR = sv.getItemStrings()
@@ -223,7 +233,7 @@ print(housewares_final.tail())
 ####################################
 ## CONSTRUCT WALLPAPER DATA FRAME ##
 ####################################
-
+"""
 wallpaper = ItemParam[ItemParam['ItemUICategory']=='RoomWall'].copy()
 
 wallpaper.rename(columns={'FtrIcon': 'Image'}, inplace=True)
@@ -305,7 +315,7 @@ recipes_final = pd.concat([recipes.pop(item) for item in tab_recipes], axis=1)
 recipes_final.sort_values(by=['Name'], inplace=True)
 
 # recipes_final.to_csv(r'Recipes.csv', index=False)
-
+"""
 """ CLOTHING TESTING
 print('Clothing shapes start here:')
 
@@ -380,12 +390,8 @@ marinesuits.to_excel(writer, sheet_name='Clothing Other')
 # Close the Pandas Excel writer and output the Excel file.
 writer.save()
 
-
+"""
 ## JANKY 1.4.0 UPDATE CSV FILE
 
 newItems = ItemParam[ItemParam['Version Added']=='1.4.0'].copy()
-
-print(newItems)
-
-newItems[['ItemUICategory', 'Version Added', 'Filename', 'Internal ID', 'Name', 'ClosetIcon', 'FtrIcon', 'DIY', 'Buy', 'Sell', 'Color 1', 'Color 2', 'Size', 'Size Category', 'Surface', 'HHA Concept 1', 'HHA Concept 2', 'Catalog']].to_csv(r'newItems.csv', index = False)
-"""
+newItems.to_csv(r'newItems.csv', index = False)

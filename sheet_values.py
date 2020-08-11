@@ -53,6 +53,13 @@ def getClothingStrings():
     
     return clothingSTR
 
+def filenameToClothGroup(item, sequence):
+    options = [label for index, label in sequence.items() if item.startswith(label)]
+    if options == []:
+        return ''
+    else:
+        return max(options, key=len)
+
 def dividedBy20(row):
     if row['Filename'] == 'BellExchangeTicket':
         return 500
