@@ -1,0 +1,3 @@
+[submodule "cylindrical-earth"]
+	path = cylindrical-earth
+	url = github:lucible/cylindrical-earth
