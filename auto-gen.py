@@ -3,40 +3,40 @@ import sheet_values as sv
 import logging
 import argparse
 import math
-import sys
 
 columns_standard = ['FtrIcon',
-					'ClosetIcon',
-					'DIYRecipeIcon',
-					'DIY',
-					'Buy',
-					'Sell',
-					'Color 1',
-					'Color 2',
-					'Size',
-					'Size Category',
-					'Surface',
-					'Exchange Price',
-					'Exchange Currency',
-					'HHA Base Points',
-					'HHA Concept 1',
-					'HHA Concept 2',
-					'HHA Series',
-					'HHA Set',
-					'Tag',
-					'Catalog',
-					'Version Added',
-					'Filename',
-					'Internal ID']
+                    'ClosetIcon',
+                    'DIYRecipeIcon',
+                    'DIY',
+                    'Buy',
+                    'Sell',
+                    'Color 1',
+                    'Color 2',
+                    'Size',
+                    'Size Category',
+                    'Surface',
+                    'Exchange Price',
+                    'Exchange Currency',
+                    'HHA Base Points',
+                    'HHA Concept 1',
+                    'HHA Concept 2',
+                    'HHA Series',
+                    'HHA Set',
+                    'Tag',
+                    'Catalog',
+                    'Version Added',
+                    'Filename',
+                    'Internal ID']
 
 columns_wallpaper = ['VFX',
-					 'VFX Type',
-					 'Window Type',
-					 'Window Color',
-					 'Pane Type',
-					 'Curtain Type',
-					 'Curtain Color',
-					 'Ceiling Type']
+                     'VFX Type',
+                     'Window Type',
+                     'Window Color',
+                     'Pane Type',
+                     'Curtain Type',
+                     'Curtain Color',
+                     'Ceiling Type']
+
 
 def prep_JuneBride(csv_path):
     # Import and prep Heart Crystal info
@@ -45,12 +45,14 @@ def prep_JuneBride(csv_path):
     juneBride.rename(columns={'ExchangeItem': 'Internal ID', 'RequiredNum': 'Exchange_HC'}, inplace=True)
     return juneBride
 
+
 def prep_ItemFrom(csv_path):
     itemFrom = pd.read_csv(f'{csv_path}/ItemFrom.csv')
     itemFrom.drop(columns=['Name', 'UniqueID'], inplace=True)
     itemFrom.rename(columns={'Label': 'ItemFrom', 'HHABaseScore': 'HHA Base Points'}, inplace=True)
     itemFrom['ItemFrom'] = itemFrom['ItemFrom'].map(lambda x: x.strip('\''))
     return itemFrom
+
 
 def prep_RoomWallParam(csv_path):
     roomWallParam = pd.read_csv(f'{csv_path}/RoomWallParam.csv')
@@ -69,17 +71,18 @@ def prep_RoomWallParam(csv_path):
     roomCeiling = pd.read_csv('data/sheet-values/RoomCeiling.csv')
     roomWallParam = roomWallParam.merge(roomCeiling, on='CeilingUniqueID', how='left')
 
-    toDrop = ['AO','Light','Price','ArchUniqueID','CeilingUniqueID','CurtainTexUniqueID','CurtainUniqueID','UniqueID','ItemName','ResourceName','TextureWindow','WindowUniqueID']
+    toDrop = ['AO', 'Light', 'Price', 'ArchUniqueID', 'CeilingUniqueID', 'CurtainTexUniqueID', 'CurtainUniqueID', 'UniqueID', 'ItemName', 'ResourceName', 'TextureWindow', 'WindowUniqueID']
     roomWallParam.drop(columns=toDrop, inplace=True)
 
     roomWallParam[['Window Color', 'Pane Type', 'Curtain Color']] = roomWallParam[['Window Color', 'Pane Type', 'Curtain Color']].fillna('NA')
 
     return roomWallParam
 
+
 def build_item_list(yes_strings_mm_baby):
     csv_path = './data/game_parsed/csv'
 
-    ItemParam = pd.read_csv(f'{csv_path}/ItemParam.csv', low_memory = False)
+    ItemParam = pd.read_csv(f'{csv_path}/ItemParam.csv', low_memory=False)
 
     logging.info(ItemParam.shape)
 
@@ -98,11 +101,13 @@ def build_item_list(yes_strings_mm_baby):
         # Merge ItemClothGroup with clothing strings
         clothSTR = sv.getClothingStrings()
         clothGroup = clothGroup.merge(clothSTR, on='ClothGroup ID', how='left')
-        clothGroup.replace({'Label_ClothGroup': {'ShoesKneeEngineerboots_': 'ShoesKneeEngineerboots',
-                                                'TopsTexTopCoatLPoncho': 'TopsTexTopCoatLPompom',
-                                                'TopsTexTopCoatHWorkapron': 'TopsTexTopCoatLWorkapron',
-                                                'TopsTexTopCoatHDiner': 'TopsTexTopCoatLDiner',
-                                                'TopsTexOnepieceBlongLHippie': 'TopsTexTopCoatLPoncho'}}, inplace=True)
+        clothGroup.replace({'Label_ClothGroup': {
+            'ShoesKneeEngineerboots_': 'ShoesKneeEngineerboots',
+            'TopsTexTopCoatLPoncho': 'TopsTexTopCoatLPompom',
+            'TopsTexTopCoatHWorkapron': 'TopsTexTopCoatLWorkapron',
+            'TopsTexTopCoatHDiner': 'TopsTexTopCoatLDiner',
+            'TopsTexOnepieceBlongLHippie': 'TopsTexTopCoatLPoncho',
+        }}, inplace=True)
 
     # Prep for merge by creating Label_ClothGroup column from Filename column
     ItemParam['Label_ClothGroup'] = ItemParam['Filename'].apply(sv.filenameToClothGroup, args=(clothGroup['Label_ClothGroup'],))
@@ -234,6 +239,7 @@ def build_item_list(yes_strings_mm_baby):
     logging.info('Item Table Completed.')
     return ItemParam
 
+
 def write_to_csv(yes_strings_mm_baby, no_write, version):
     if yes_strings_mm_baby is True:
         columns_standard.insert(0, 'Name')
@@ -243,22 +249,23 @@ def write_to_csv(yes_strings_mm_baby, no_write, version):
     print('Building full item list...')
 
     full_list = build_item_list(yes_strings_mm_baby)
-    
+
     print('Full item list built!')
 
     if version:
-        final_list = full_list[full_list['Version Added']==version].copy()
+        final_list = full_list[full_list['Version Added'] == version].copy()
         final_list = final_list[columns]
-        
+
         if no_write:
-            final_list.to_csv(f'./output/NewItems_v{version}.csv', index = False)
+            final_list.to_csv(f'./output/NewItems_v{version}.csv', index=False)
             print(f'Item list written to ./output/NewItems_v{version}.csv')
     else:
         final_list = full_list[columns]
 
         if no_write:
-            final_list.to_csv(r'./output/ACNH-Item-List.csv', index = False)
+            final_list.to_csv(r'./output/ACNH-Item-List.csv', index=False)
             print('Item list written to ./output/ACNH-Item-List.csv')
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(allow_abbrev=False)
