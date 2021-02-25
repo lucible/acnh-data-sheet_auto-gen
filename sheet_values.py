@@ -1,5 +1,5 @@
 import pandas as pd
-import math as m
+import math
 import re
 
 VersionAdded = ['1.0.0',
@@ -15,9 +15,11 @@ VersionAdded = ['1.0.0',
                 '1.8.0',
                 '1.9.0']
 
+
 def stripString(df):
     df['label'] = df['label'].map(lambda x: re.sub(r'[a-zA-Z_]*', '', x))
     return df
+
 
 def getItemStrings():
     path = 'data/game_parsed/acnh-strings-usen/Item'
@@ -29,17 +31,18 @@ def getItemStrings():
 
     # Remove object plural strings
     itemSTR = itemSTR[~itemSTR['label'].str.endswith('_pl').fillna('')]
-    
+
     # Strip label to ID only and remove yucky chars from name string
     itemSTR = stripString(itemSTR)
-    
+
     # Cast label to int64
     itemSTR = itemSTR.astype({'label': 'int64'})
-    
+
     # Rename columns
     itemSTR.rename(columns={'English': 'Name_Items', 'label': 'Internal ID'}, inplace=True)
 
     return itemSTR
+
 
 def getClothingStrings():
     path = 'data/game_parsed/acnh-strings-usen/Outfit/GroupName'
@@ -50,32 +53,33 @@ def getClothingStrings():
     
     # Strip label to ID only and remove yucky chars from name string
     clothingSTR = stripString(clothingSTR)
-    
+
     # Cast label to int64
     clothingSTR = clothingSTR.astype({'label': 'int64'})
-    
+
     # Rename column 'text' to 'Name'
     clothingSTR.rename(columns={'English': 'Name_Clothing', 'label' : 'ClothGroup ID'}, inplace=True)
     
     return clothingSTR
 
+
 def filenameToClothGroup(item, sequence):
-    options = [label for index, label in sequence.items() if item.startswith(label)]
-    if options == []:
+    options = [label for label in sequence.values() if item.startswith(label)]
+    if not options:
         return ''
-    else:
-        return max(options, key=len)
+    return max(options, key=len)
+
 
 def dividedBy20(row):
     if row['Filename'] == 'BellExchangeTicket':
         return 500
-    else:
-        return row['Buy'] / 20
+    return row['Buy'] / 20
+
 
 def calculateNookMilesPrice(row):
     NookMilesFrom = ['Fence', 'MileExchangeLicense', 'MileExchangeNsoPresent', 'MileExchangeOnce', 'MileExchangePhoneCase', 'MileExchangePocket40', 'MileExchangeRecipe1', 'MileExchangeRecipe2', 'MileExchangeRecipe3', 'MileExchangeRecipe4', 'MileExchangeRecipe5', 'SonkatsuReward2', 'SonkatsuRewardShop', 'SonkatsuRewardTent']
     switcher = {
-	    0: (lambda x: 1000),
+        0: (lambda x: 1000),
         1: dividedBy20,
         2: dividedBy20,
         3: dividedBy20,
@@ -90,28 +94,26 @@ def calculateNookMilesPrice(row):
         12: dividedBy20,
         13: dividedBy20
     }
-    if NookMilesFrom.count(row['ItemFrom']) > 0:
-        func = switcher.get(NookMilesFrom.index(row['ItemFrom']), lambda: '')
-        return func(row)
-    else:
+
+    if row['ItemFrom'] not in NookMilesFrom:
         return ''
+    func = switcher.get(NookMilesFrom.index(row['ItemFrom']), lambda: '')
+    return func(row)
+
 
 def labelNookMiles(row):
     if row['Exchange_NM'] == '':
         return ''
-    else:
-        return 'Nook Miles'
+    return 'Nook Miles'
+
 
 def labelJuneBride(row):
-    if m.isnan(row['Exchange_HC']):
+    if math.isnan(row['Exchange_HC']):
         return ''
-    else:
-        return 'Heart Crystals'
+    return 'Heart Crystals'
+
 
 def wallpaperVFX(row):
-    if row['ResName'].startswith('\'RoomSpWall'):
+    if row['ResName'].startswith(('\'RoomSpWall', '\'RoomSpFloor')):
         return 'Yes'
-    elif row['ResName'].startswith('\'RoomSpFloor'):
-        return 'Yes'
-    else:
-        return 'No'
+    return 'No'
