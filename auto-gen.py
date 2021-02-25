@@ -9,6 +9,9 @@ columns_standard = ['FtrIcon',
 					'ClosetIcon',
 					'DIYRecipeIcon',
 					'DIY',
+                    'Stack Size',
+                    'ItemKind',
+                    'ItemFrom',
 					'Buy',
 					'Sell',
 					'Color 1',
@@ -51,6 +54,13 @@ def prep_ItemFrom(csv_path):
     itemFrom.rename(columns={'Label': 'ItemFrom', 'HHABaseScore': 'HHA Base Points'}, inplace=True)
     itemFrom['ItemFrom'] = itemFrom['ItemFrom'].map(lambda x: x.strip('\''))
     return itemFrom
+
+def prep_ItemKind(csv_path):
+    itemKind = pd.read_csv(f'{csv_path}/ItemKind.csv')
+    itemKind.drop(columns=['Name', 'UniqueID'], inplace=True)
+    itemKind.rename(columns={'Label': 'ItemKind', 'MultiHoldMaxNum': 'Stack Size'}, inplace=True)
+    itemKind['ItemKind'] = itemKind['ItemKind'].map(lambda x: x.strip('\''))
+    return itemKind
 
 def prep_RoomWallParam(csv_path):
     roomWallParam = pd.read_csv(f'{csv_path}/RoomWallParam.csv')
@@ -223,6 +233,12 @@ def build_item_list(yes_strings_mm_baby):
 
     logging.info(ItemParam.shape)
 
+    # Stack Size column
+    # TO DO: complete this??
+    ItemParam = ItemParam.merge(prep_ItemKind(csv_path), on='ItemKind', how='left')
+
+    logging.info(ItemParam.shape)
+
     # VFX (Wallpaper)
     ItemParam['VFX'] = ItemParam.apply(sv.wallpaperVFX, axis=1)
 
@@ -231,12 +247,17 @@ def build_item_list(yes_strings_mm_baby):
 
     logging.info(ItemParam.shape)
 
+    # Stack Size
+    # TO DO: complete this??
+
     logging.info('Item Table Completed.')
     return ItemParam
 
 def write_to_csv(yes_strings_mm_baby, no_write, version):
     if yes_strings_mm_baby is True:
         columns_standard.insert(0, 'Name')
+
+    columns_standard.insert(0, 'ItemUICategory')
 
     columns = columns_standard + columns_wallpaper
 
