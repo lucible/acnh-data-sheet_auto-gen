@@ -1,3 +1,6 @@
 [submodule "cylindrical-earth"]
 	path = cylindrical-earth
 	url = github:lucible/cylindrical-earth
+[submodule "data/game_parsed/acnh-strings-usen"]
+	path = data/game_parsed/acnh-strings-usen
+	url = https://github.com/alexislours/acnh-strings-usen.git
