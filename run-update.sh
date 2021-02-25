@@ -5,27 +5,33 @@
 helpFunction()
 {
    echo ""
-   echo "Usage: $0 -a folderID -b accessTK -c version"
+   echo "Usage: $0 -f folderID -t accessTK -v version -VP periods"
    echo -e "\t-f Google Drive folder ID"
    echo -e "\t-t OAuth 2.0 Playground Access Token"
    echo -e "\t-v Version number without periods"
+   echo -e "\t-m Version number with periods"
    exit 1 # Exit script after printing help
 }
 
-while getopts "f:t:v:" opt
+while getopts "f:t:v:m:" opt
 do
    case "$opt" in
       f ) folderID="$OPTARG" ;;
       t ) accessTK="$OPTARG" ;;
       v ) version="$OPTARG" ;;
-      ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
+      m ) periods="$OPTARG" ;;
+      ? ) echo "" ;; # Print helpFunction in case parameter is non-existent (helpFunction)
    esac
 done
 
 # Print helpFunction in case parameters are empty
-if [ -z "$folderID" ] || [ -z "$accessTK" ]  || [ -z "$version" ]
+if [ -z "$folderID" ] || [ -z "$accessTK" ]  || [ -z "$version" ] || [ -z "$periods" ]
 then
    echo "Some or all of the parameters are empty";
+   echo "$folderID";
+   echo "$accessTK";
+   echo "$version";
+   echo "$periods";
    helpFunction
 fi
 
@@ -68,6 +74,6 @@ cd ../../../
 
 echo "Dumping new item table..."
 
-python ./auto-gen.py --update ${version}
+python ./auto-gen.py --update ${periods}
 
 echo "Done!"
